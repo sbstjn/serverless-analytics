@@ -18,8 +18,8 @@ After deploying the service you will have a HTTP endpoint using API Gateway that
 
 #### Examples
 
-- Static website to track visitors
-- API & Dashboard to show metrics
+- [Static website to track visitors](http://sls-analytics-website-example.s3-website-us-east-1.amazonaws.com)
+- [API & Dashboard to show metrics](http://sls-analytics-website-dashboard.s3-website-us-east-1.amazonaws.com/)
 
 ## Configuration
 
