@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Dashboard - Serverless Analytics</title>
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link href="/style.css" media="all" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="container">
+      <table>
+        <thead>
+          <tr>
+            <th>Resource</th>
+            <th>Count</th>
+          </tr>
+        </thead>
+        <tbody id="data"></tbody>
+      </table>
+    </div>
+    <footer>
+      <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="344.000000pt" height="439.000000pt" viewBox="0 0 344.000000 439.000000" preserveAspectRatio="xMidYMid meet">
+        <!-- https://github.com/nicolindemann/hamburg-icon -->
+        <g transform="translate(0.000000,439.000000) scale(0.100000,-0.100000)" fill="#000000" stroke="none">
+          <path d="M1642 4368 c-7 -7 -12 -27 -12 -45 0 -33 0 -33 -49 -33 -65 0 -73 -12 -69 -102 l3 -73 58 -3 57 -3 0 -33 c0 -30 -4 -34 -42 -46 -134 -40 -239 -124 -295 -236 -32 -67 -37 -84 -37 -154 -1 -74 -3 -80 -22 -80 -11 0 -25 -5 -32 -12 -16 -16 -16 -200 0 -216 7 -7 31 -12 55 -12 l43 0 0 -700 0 -700 -55 0 -55 0 0 640 0 640 -415 0 -415 0 0 -640 0 -640 -75 0 c-112 0 -115 -4 -115 -180 0 -127 2 -142 20 -160 20 -20 33 -20 1518 -20 1439 0 1500 1 1515 18 14 15 17 42 17 160 0 173 -5 182 -100 182 l-60 0 0 640 0 640 -415 0 -415 0 0 -640 0 -640 -60 0 -60 0 0 700 0 700 48 0 c26 0 53 5 60 12 16 16 16 200 0 216 -7 7 -20 12 -30 12 -15 0 -18 9 -18 59 0 176 -119 334 -299 397 -78 28 -81 30 -81 61 0 32 1 32 53 35 l52 3 3 79 c3 90 0 96 -65 96 l-43 0 0 39 c0 26 -5 41 -16 45 -28 11 -140 6 -152 -6z"></path>
+          <path d="M681 3745 c-32 -45 -33 -45 -92 -45 -32 0 -59 -4 -59 -9 0 -5 5 -32 12 -59 11 -49 10 -51 -25 -99 l-36 -49 53 -26 c50 -25 53 -28 65 -82 l12 -55 55 24 56 25 48 -25 49 -25 10 38 c6 20 11 45 11 54 0 11 20 28 56 46 l55 28 -37 48 c-35 46 -36 49 -25 91 19 74 18 75 -47 75 -57 0 -59 1 -92 45 -19 25 -34 45 -35 45 -1 0 -16 -20 -34 -45z"></path>
+          <path d="M2691 3745 c-32 -45 -33 -45 -92 -45 -32 0 -59 -4 -59 -9 0 -5 5 -32 12 -59 11 -49 10 -51 -25 -99 l-36 -49 53 -26 c50 -25 53 -28 65 -82 l12 -55 55 24 56 25 48 -25 49 -25 10 38 c6 20 11 45 11 54 0 11 20 28 56 46 l55 28 -37 48 c-35 46 -36 49 -25 91 19 74 18 75 -47 75 -57 0 -59 1 -92 45 -19 25 -34 45 -35 45 -1 0 -16 -20 -34 -45z"></path>
+          <path d="M191 733 c-96 -384 -176 -704 -179 -710 -3 -10 134 -13 667 -13 l671 0 0 253 c1 285 11 371 59 472 37 79 109 158 176 193 71 36 169 36 240 0 92 -48 159 -132 202 -254 27 -78 27 -83 31 -371 l4 -293 685 0 c544 0 684 3 681 13 -3 6 -83 326 -179 710 l-174 697 -1355 0 -1355 0 -174 -697z"></path>
+        </g>
+      </svg>
+      <p id="mih">Made in<br>Hamburg</p>
+      <p id="sbstjn"><a href="https://sbstjn.com">sbstjn.com</a></p>
+    </footer>
+  </body>
+  <script>
+    function render(data) {
+      const rows = data.map(
+        item => '<tr><td><strong>' + item.name + '</strong><br />' + item.url + '</td><td>' + item.value + '</td></tr>'
+      )
+
+      document.querySelector('#data').innerHTML = rows.join('')
+      document.querySelector('#container').classList.add('show')
+    } 
+
+    fetch(
+      '<%=APIRootURL%>/<%=APIStageName%>/list'
+    ).then(
+      res => res.json()
+    ).then(
+      render
+    )
+  </script>
+</html>

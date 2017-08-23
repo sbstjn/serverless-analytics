@@ -1,0 +1,106 @@
+@import url('https://fonts.googleapis.com/css?family=Nunito+Sans:600');
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400');
+
+body {
+  background-color: #f7f7f7;
+  padding: 7px 5px 0;
+  -webkit-text-size-adjust: 100%;
+}
+
+#container {
+  font-family: Open Sans,sans-serif;
+  display: none;
+  margin: 50px auto;
+  max-width: 720px;
+
+  th {
+    font-weight: 400;
+    background-color: #dddddd;
+    text-align: left;
+    font-size: 14px;
+    padding: 6px 8px;
+  }
+
+  td {
+    font-weight: 300;
+    padding: 4px 8px;
+    font-size: 12px;
+
+    strong {
+      font-size: 14px;
+      font-weight: 400;
+    }
+  }
+
+  tr {
+    &:nth-child(odd) {
+      td {
+        background-color: #eeeeee;
+      }
+    }
+  }
+
+  th, td {
+    &:last-child {
+      text-align: center;
+      width: 10%;
+    }
+  }
+
+  table {
+    width: 100%;
+  }
+
+  &.show {
+    display: block;
+  }
+}
+
+footer {
+  padding: 60px 0 30px;
+  text-align: center;
+
+  #mih {
+    text-transform: uppercase;
+    line-height: 16px;
+    color: #999;
+    font-family: Nunito Sans,sans-serif;
+    letter-spacing: .07em;
+    font-size: 12px;
+  }
+
+  #version a {
+    font-family: Nunito Sans,sans-serif;
+    letter-spacing: .07em;
+    font-size: 12px;
+    color: #ccc;
+    text-decoration: none;
+
+    &:hover {
+      color: #ddd;
+      text-decoration: underline;
+    }
+  }
+
+  #sbstjn {
+    font-family: Nunito Sans,sans-serif;
+    font-size: 14px;
+
+    a {
+      color: #666;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  svg {
+    height: 70px;
+    max-width: 120px;
+    path {
+      fill: #ddd;
+    }
+  }
+}

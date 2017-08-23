@@ -1,0 +1,258 @@
+service: sls-analytics
+
+plugins:
+  - serverless-stack-output
+  - serverless-dynamodb-autoscaling
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  memorySize: 128
+  timeout: 120
+  region: us-east-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action: [ dynamodb:UpdateItem, dynamodb:Scan ]
+      Resource: { Fn::GetAtt: [ DynamoDBTable, Arn ] }
+  environment:
+    DYNAMODB_TABLE_NAME: ${self:custom.names.dynamodb}
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  names:
+    bucket: 
+      website: ${self:service}-website-example
+      dashboard: ${self:service}-website-dashboard
+    resource: track
+    dynamodb: ${self:service}-data
+    kinesis: ${self:service}-stream
+  output:
+    file: .serverless/output.json
+  capacities:
+    - table: DynamoDBTable
+      read:
+        minimum: 5
+        maximum: 100
+      write:
+        minimum: 5
+        maximum: 100
+
+package:
+  exclude:
+    - .gitignore
+    - CODE_OF_CONDUCT.md
+    - dist/**
+    - infra.png
+    - LICENSE.md
+    - node_modules/**
+    - package.json
+    - README.md
+    - scripts/**
+    - sites/**
+    - yarn.lock
+
+functions:
+  list:
+    handler: src/list.get
+
+  route-list:
+    handler: src/route/list.get
+    events:
+      - http:
+          path: /list
+          method: GET
+
+  process:
+    handler: src/process.run
+    events:
+      - stream:
+          type: kinesis
+          arn: { Fn::GetAtt: [ KinesisStream, Arn ] }
+          batchSize: 100
+          startingPosition: TRIM_HORIZON
+
+resources:
+  Outputs:
+    TrackingRootURL:
+      Description: Root URL of the tracking API Gateway
+      Value: { Fn::Join: [ '', [ https://, { Ref: HTTPRestApi }, .execute-api., { Ref: AWS::Region }, .amazonaws.com ] ] }
+    TrackingStageName:
+      Description: Name of the tracking API Gateway Stage
+      Value: ${self:custom.stage}
+    TrackingResource:
+      Description: Name of the tracking API Gateway Resource
+      Value: ${self:custom.names.resource}
+    BucketNameWebsite:
+      Description: Name of the example website S3 Bucket
+      Value: ${self:custom.names.bucket.website}
+    BucketNameDashboard:
+      Description: Name of the dashboard S3 Bucket
+      Value: ${self:custom.names.bucket.dashboard}
+    APIRootURL:
+      Description: Root URL of the data API Gateway
+      Value: { Fn::Join: [ '', [ https://, { Ref: ApiGatewayRestApi }, .execute-api., { Ref: AWS::Region }, .amazonaws.com ] ] }
+    APIStageName:
+      Description: Name of the data API Gateway Stage
+      Value: ${self:custom.stage}
+    Region:
+      Description: AWS Region
+      Value: { Ref: 'AWS::Region' }
+
+  Resources:
+    KinesisStream:
+      Type: AWS::Kinesis::Stream
+      Properties:
+        Name: ${self:custom.names.kinesis}
+        ShardCount: 1
+
+    DynamoDBTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.names.dynamodb}
+        AttributeDefinitions:
+          - AttributeName: url
+            AttributeType: S
+        KeySchema:
+          - AttributeName: url
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+
+    BucketDashboard:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.names.bucket.dashboard}
+        WebsiteConfiguration:
+          IndexDocument: index.html
+          ErrorDocument: error.html
+
+    BucketDashboardPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: { Ref: BucketDashboard }
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action: s3:GetObject
+            Resource: arn:aws:s3:::${self:custom.names.bucket.dashboard}/*
+
+    BucketWebsite:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.names.bucket.website}
+        WebsiteConfiguration:
+          IndexDocument: index.html
+          ErrorDocument: error.html
+
+    BucketWebsitePolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: { Ref: BucketWebsite }
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action: s3:GetObject
+            Resource: arn:aws:s3:::${self:custom.names.bucket.website}/*
+
+    HTTPResource:
+      Type: AWS::ApiGateway::Resource
+      Properties:
+        RestApiId: { Ref: HTTPRestApi }
+        ParentId: { Fn::GetAtt: [ HTTPRestApi, RootResourceId ] }
+        PathPart: ${self:custom.names.resource}
+
+    HTTPRestApi:
+      Type: AWS::ApiGateway::RestApi
+      Properties:
+        Name: ${self:custom.stage}-${self:service}/${self:custom.names.resource}
+        Description: Tracking HTTP endpoint to put data to Kinesis
+        FailOnWarnings: true
+
+    HTTPAccount:
+      Type: AWS::ApiGateway::Account
+
+    HTTPDeployment:
+      Type: AWS::ApiGateway::Deployment
+      DependsOn: [ HTTPMethod, HTTPMethodOptions ]
+      Properties:
+        RestApiId: { Ref: HTTPRestApi }
+        StageName: ${self:custom.stage}
+
+    HTTPMethod:
+      Type: AWS::ApiGateway::Method
+      Properties:
+        AuthorizationType: NONE
+        HttpMethod: POST
+        Integration:
+          Type: AWS
+          IntegrationHttpMethod: POST
+          Credentials: { Fn::GetAtt: [ IAMRole, Arn ] }
+          Uri: { Fn::Join: [ ':', [ arn:aws:apigateway, { Ref: AWS::Region }, kinesis:action/PutRecord ] ] }
+          RequestTemplates:
+            application/json: "{\"StreamName\": \"${self:custom.names.kinesis}\",\"PartitionKey\": \"one\",\"Data\": \"$util.base64Encode($input.json('$'))\"}"
+          PassthroughBehavior: WHEN_NO_MATCH
+          IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        ResourceId: { Ref: HTTPResource }
+        RestApiId: { Ref: HTTPRestApi }
+        MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+
+    HTTPMethodOptions:
+      Type: AWS::ApiGateway::Method
+      Properties:
+        AuthorizationType: NONE
+        HttpMethod: OPTIONS
+        Integration:
+          Type: MOCK
+          IntegrationResponses:
+            - ResponseParameters:
+                method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                method.response.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+                method.response.header.Access-Control-Allow-Origin: "'*'"
+              ResponseTemplates:
+                application/json: ''
+              StatusCode: 200
+          PassthroughBehavior: NEVER
+          RequestTemplates:
+            application/json: '{"statusCode": 200}'
+        ResourceId: { Ref: HTTPResource }
+        RestApiId: { Ref: HTTPRestApi }
+        MethodResponses:
+        - ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+          StatusCode: 200
+
+    IAMRole: 
+      Type: AWS::IAM::Role
+      Properties: 
+        AssumeRolePolicyDocument: 
+          Version: '2012-10-17'
+          Statement: 
+            - Effect: Allow
+              Principal: { Service: [ apigateway.amazonaws.com ] }
+              Action: [ sts:AssumeRole ]
+        Path: /
+        Policies: 
+          - PolicyName: root
+            PolicyDocument: 
+              Version: '2012-10-17'
+              Statement: 
+                - Effect: Allow
+                  Action: kinesis:PutRecord
+                  Resource: { Fn::GetAtt: [ KinesisStream, Arn ] }

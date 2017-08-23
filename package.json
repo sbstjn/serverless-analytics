@@ -1,0 +1,15 @@
+{
+  "license": "MIT",
+  "scripts": {
+    "build": "./scripts/build.sh",
+    "deploy": "./scripts/deploy.sh"
+  },
+  "devDependencies": {
+    "ejs-cli": "^2.0.0",
+    "node-sass": "^4.5.3",
+    "s3sync-cli": "^2.0.0",
+    "serverless": "^1.17.0",
+    "serverless-dynamodb-autoscaling": "^0.6.1",
+    "serverless-stack-output": "0.2"
+  }
+}
