@@ -19,11 +19,11 @@ After deploying the service you will have a HTTP endpoint using API Gateway that
 #### Examples
 
 - [Static website to track visitors](http://sls-analytics-website-example.s3-website-us-east-1.amazonaws.com)
-- [API & Dashboard to show metrics](http://sls-analytics-website-dashboard.s3-website-us-east-1.amazonaws.com/)
+- [Dashboard w/ API to show metrics](http://sls-analytics-website-dashboard.s3-website-us-east-1.amazonaws.com/)
 
 ## Configuration
 
-All settings can be changes in the `serverless.yml` configuration file. You can easily change the DynamoDB Table, Kinesis Stream and API Gateway Resource names:
+All settings can be customized in the `serverless.yml` configuration file. You can easily change the DynamoDB Table, Kinesis Stream and API Gateway tracking resource name:
 
 ```yaml
 service: sls-analytics
@@ -44,7 +44,7 @@ The S3 Bucket configuration is only needed for the included example website. If 
 
 ## Deployment
 
-Running `yarn deploy` will trigger a default [serverless](https://serverless.com) deployment. After the output of the CloudFormation Stack is available, the included static websites will be generated *(Using the hostname from the stack output)* and uploaded to the configured S3 buckets. As the final step, the deploy process will display the URL of the example website and data dashboard:
+Running `yarn deploy` will trigger a [serverless](https://serverless.com) deployment. After the output of the CloudFormation Stack is available, the included static websites will be generated *(using the hostname from the stack output)* and uploaded to the configured S3 buckets. As the final step, the deploy process will display the URL of the example website and dashboard:
 
 ```bash
 # Install dependencies
@@ -62,41 +62,83 @@ The **website** includes a simple HTML file, some stylings, and a few JavaScript
 
 ## Tracking
 
-Basically tracking is nothing more than a HTTP request to the API Gateway with a set of payload information *(currently just `url` and `name`)*. Normally you would have a non-JS fallback, like an image e.g., but a simple `fetch` call does the job for now:
+Basically, tracking is nothing more than sending a HTTP request to the API with a set of payload information *(currently `url`, `date`, `name`, and a `website` id)*. Normally you would have an additional non-JS fallback, like an image e.g., but a simple `fetch` call does the job for now:
 
 ```js
 fetch(
   'https://n6q0egpreh.execute-api.us-east-1.amazonaws.com/v1/track',
   {
     method: "POST",
-    body: JSON.stringify( { url: location.href, name: document.title } ),
-    headers: new Headers(
+    body: JSON.stringify(
       {
-        "Content-Type": "application/json"
+        date: new Date().getTime(),
+        name: document.title,
+        url: location.href,
+        website: 'yfFbTv1GslRcIkUsWpa7' // Random ID
       }
-    )
+    ),
+    headers: new Headers({ "Content-Type": "application/json" })
   }
 )
 ```
 
 ## Data Access
 
-You can get a list of all tracked data by invoking the `list` function, or just have a look into your DynamoDB or use the included dashboard.
+An example [dashboard to access tracking data](http://sls-analytics-website-dashboard.s3-website-us-east-1.amazonaws.com/) is included and deployed to S3. The URL will be returned by the `deploy` task. You can access the metrics using `sls invoke` as well. Just provide the `website` and `date` parameters:
+
+### Top Content
+
+The included `metric-pages` function scans the DynamoDB for the pages with the most hits on a specific `date` value:
 
 ```bash
-$ > sls invoke -f list
+$ > sls invoke -f metric-pages --data '{ "website": "yfFbTv1GslRcIkUsWpa7", "date": "MONTH:2017-08" }'
 
 [
-  {
-    "name": "http://sls-analytics-website-example.s3-website-us-east-1.amazonaws.com/",
-    "value": 10
-  },
-  {
-    "name": "http://sls-analytics-website-example.s3-website-us-east-1.amazonaws.com/?foo=bar",
-    "value": 2
-  }
+    {
+        "value": 28,
+        "name": "Example Website - Serverless Analytics",
+        "url": "http://sls-analytics-new-website.s3-website-us-east-1.amazonaws.com/bar"
+    },
+    {
+        "value": 19,
+        "name": "Example Website - Serverless Analytics",
+        "url": "http://sls-analytics-new-website.s3-website-us-east-1.amazonaws.com/baz"
+    }
 ]
 ```
+
+### Requests per URL
+
+The included `metric-hits` function scans the DynamoDB for statistics for a specific `url` in a given `date` period.
+
+```bash
+$ > sls invoke -f metric-hits --data '{ "website": "yfFbTv1GslRcIkUsWpa7", "url": "http://sls-analytics-new-website.s3-website-us-east-1.amazonaws.com/baz", "date": "HOUR:2017-08-24T23"}'
+
+[
+    {
+        "value": 1,
+        "date": "2017-08-24T23:04"
+    },
+    {
+        "value": 1,
+        "date": "2017-08-24T23:07"
+    },
+    {
+        "value": 14,
+        "date": "2017-08-24T23:08"
+    },
+    {
+        "value": 1,
+        "date": "2017-08-24T23:13"
+    }
+]
+```
+
+### Date Parameter
+
+The DynamoDB stores the absolute hits number for the dimensions `YEAR`, `MONTH`, `DATE`, `HOUR`, and `MINUTE` per default. This may cause lots of write capacities when processing events, but with the [serverless-dynamodb-autoscaling](https://github.com/sbstjn/serverless-dynamodb-autoscaling) plugin your DynamoDB should scale the capacities when needed.
+
+All dates are treated as UTC values!
 
 ## Infrastructure
 

@@ -1,4 +1,4 @@
-service: sls-analytics
+service: sls-analytics-new
 
 plugins:
   - serverless-stack-output
@@ -21,8 +21,8 @@ custom:
   stage: ${opt:stage, self:provider.stage}
   names:
     bucket: 
-      website: ${self:service}-website-example
-      dashboard: ${self:service}-website-dashboard
+      website: ${self:service}-website
+      dashboard: ${self:service}-dashboard
     resource: track
     dynamodb: ${self:service}-data
     kinesis: ${self:service}-stream
@@ -31,11 +31,11 @@ custom:
   capacities:
     - table: DynamoDBTable
       read:
-        minimum: 5
-        maximum: 100
+        minimum: 10
+        maximum: 120
       write:
-        minimum: 5
-        maximum: 100
+        minimum: 10
+        maximum: 120
 
 package:
   exclude:
@@ -54,6 +54,12 @@ package:
 functions:
   list:
     handler: src/list.get
+
+  metric-pages:
+    handler: src/metric/pages.get
+
+  metric-hits:
+    handler: src/metric/hits.get
 
   route-list:
     handler: src/route/list.get
@@ -110,11 +116,15 @@ resources:
       Properties:
         TableName: ${self:custom.names.dynamodb}
         AttributeDefinitions:
-          - AttributeName: url
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: date
             AttributeType: S
         KeySchema:
-          - AttributeName: url
+          - AttributeName: id
             KeyType: HASH
+          - AttributeName: date
+            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
@@ -144,7 +154,7 @@ resources:
         BucketName: ${self:custom.names.bucket.website}
         WebsiteConfiguration:
           IndexDocument: index.html
-          ErrorDocument: error.html
+          ErrorDocument: index.html
 
     BucketWebsitePolicy:
       Type: AWS::S3::BucketPolicy
