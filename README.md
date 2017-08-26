@@ -21,11 +21,11 @@ To access the tracked data, a basic dashboard with a JSON API is included as wel
 #### Dashboard
 
 - Amazon API Gateway for JSON API
-- [Dashboard w/ API to show metrics](http://sls-analytics-website-dashboard.s3-website-us-east-1.amazonaws.com/)
+- [Dashboard w/ API to show metrics](http://sls-analytics-dashboard.s3-website-us-east-1.amazonaws.com/)
 
 #### Example
 
-- [Static website to track visitors](http://sls-analytics-website-example.s3-website-us-east-1.amazonaws.com)
+- [Static website to track visitors](http://sls-analytics-website.s3-website-us-east-1.amazonaws.com)
 
 *The use of two API Gateways (data tracking and reading) is intended. You might have different settings for tracking and data access when you build something meaningful out of this example.*
 
@@ -62,8 +62,8 @@ $ > yarn deploy
 
 […]
 
-Dashboard:  http://sls-analytics-website-dashboard.s3-website-us-east-1.amazonaws.com/
-Website:    http://sls-analytics-website-example.s3-website-us-east-1.amazonaws.com/
+Dashboard:  http://sls-analytics-dashboard.s3-website-us-east-1.amazonaws.com/
+Website:    http://sls-analytics-website.s3-website-us-east-1.amazonaws.com/
 ```
 
 The **website** includes a simple HTML file, some stylings, and a few JavaScript lines that send a request to the tracking API on every page load. Open the URL in a web browser, hit a few times the refresh button and take a look at the DynamoDB table or the **dashboard** URL.
@@ -74,7 +74,7 @@ Basically, tracking is nothing more than sending a HTTP request to the API with 
 
 ```js
 fetch(
-  'https://n6q0egpreh.execute-api.us-east-1.amazonaws.com/v1/track',
+  'https://lqwyep8qee.execute-api.us-east-1.amazonaws.com/v1/track',
   {
     method: "POST",
     body: JSON.stringify(
@@ -92,14 +92,14 @@ fetch(
 
 ## Data Access
 
-An example [dashboard to access tracked data](http://sls-analytics-website-dashboard.s3-website-us-east-1.amazonaws.com/) is included and deployed to S3. The URL will be displayed after the `deploy` task. You can access the metrics using basic `curl` requests as well. Just provide the `website` and `date` parameters:
+An example [dashboard to access tracked data](http://sls-analytics-dashboard.s3-website-us-east-1.amazonaws.com/) is included and deployed to S3. The URL will be displayed after the `deploy` task. You can access the metrics using basic `curl` requests as well. Just provide the `website` and `date` parameters:
 
 ### Top Content
 
 The `ranking` resource scans the DynamoDB for pages with the most hits on a specific `date` value:
 
 ```bash
-$ > curl https://p026537a2j.execute-api.us-east-1.amazonaws.com/dev/ranking?website=yfFbTv1GslRcIkUsWpa7&date=MONTH:2017-08
+$ > curl https://lqwyep8qee.execute-api.us-east-1.amazonaws.com/dev/ranking?website=yfFbTv1GslRcIkUsWpa7&date=MONTH:2017-08
 
 [
   {
@@ -125,7 +125,7 @@ $ > curl https://p026537a2j.execute-api.us-east-1.amazonaws.com/dev/ranking?webs
 The `series` resource scans the DynamoDB for data about a specific `url` in a given `date` period.
 
 ```bash
-$ > curl https://p026537a2j.execute-api.us-east-1.amazonaws.com/dev/series?website=yfFbTv1GslRcIkUsWpa7&date=HOUR:2017-08-25T13&url=http://sls-analytics-website.s3-website-us-east-1.amazonaws.com/baz
+$ > curl https://lqwyep8qee.execute-api.us-east-1.amazonaws.com/dev/series?website=yfFbTv1GslRcIkUsWpa7&date=HOUR:2017-08-25T13&url=http://sls-analytics-website.s3-website-us-east-1.amazonaws.com/baz
 
 [
   {
