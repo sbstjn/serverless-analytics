@@ -30,6 +30,7 @@ export function get(e: LambdaHttpEvent, c: any, cb: any): void {
   ).then(
     (list: DynamoDBItem[]) => list.map(
       (item: DynamoDBItem) => ({
+        name: item.name,
         url: item.id.split(':').slice(1).join(':'),
         value: parseInt(item.value, 10)
       })

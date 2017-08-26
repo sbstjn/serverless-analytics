@@ -20,6 +20,7 @@ provider:
 
 custom:
   stage: ${opt:stage, self:provider.stage}
+  website: yfFbTv1GslRcIkUsWpa7
   names:
     bucket: 
       website: ${self:service}-website
@@ -102,6 +103,9 @@ resources:
     Region:
       Description: AWS Region
       Value: { Ref: 'AWS::Region' }
+    WebsiteID:
+      Description: Website ID
+      Value: ${self:custom.website}
 
   Resources:
     KinesisStream:

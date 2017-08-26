@@ -7,6 +7,7 @@
     <link href="/style.css" media="all" rel="stylesheet" />
   </head>
   <body>
+    <div class="loader">Loading...</div>
     <div id="container">
       <table>
         <thead>
@@ -38,12 +39,13 @@
         item => '<tr><td><strong>' + item.name + '</strong><br />' + item.url + '</td><td>' + item.value + '</td></tr>'
       )
 
+      document.querySelector('.loader').style.display = 'none'
       document.querySelector('#data').innerHTML = rows.join('')
       document.querySelector('#container').classList.add('show')
     } 
 
     fetch(
-      '<%=APIRootURL%>/<%=APIStageName%>/list'
+      '<%=APIRootURL%>/<%=APIStageName%>/ranking?website=<%=WebsiteID%>&date=YEAR:2017'
     ).then(
       res => res.json()
     ).then(

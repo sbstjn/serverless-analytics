@@ -8,6 +8,7 @@ declare interface EventData {
 declare interface DynamoDBItem {
   value: string
   id: string
+  name: string
   date: string
 }
 
