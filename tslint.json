@@ -1,0 +1,17 @@
+{
+  "defaultSeverity": "error",
+  "extends": [
+    "tslint:recommended"
+  ],
+  "jsRules": {},
+  "rules": {
+    "no-console": [ false, "error" ],
+    "quotemark": [ true, "single", "avoid-escape" ],
+    "semicolon": [ true, "never" ],
+    "trailing-comma": [ true, { "multiline": "never", "singleline": "never" } ],
+    "space-before-function-paren": [ true, { "anonymous": "always", "named": "never", "asyncArrow": "always" } ],
+    "indent": [ true, "spaces", 2 ],
+    "interface-name": [ true, "never-prefix" ]
+  },
+  "rulesDirectory": []
+}

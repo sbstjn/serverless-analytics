@@ -2,14 +2,32 @@
   "license": "MIT",
   "scripts": {
     "build": "./scripts/build.sh",
-    "deploy": "./scripts/deploy.sh"
+    "deploy": "./scripts/deploy.sh",
+    "lint": "tslint src/**/*.ts",
+    "test": "jest test",
+    "test:watch": "jest test --watch"
+  },
+  "jest": {
+    "transform": {
+      ".*": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts)$",
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ]
   },
   "devDependencies": {
+    "@types/node": "^8.0.25",
+    "aws-sdk": "^2.104.0",
     "ejs-cli": "^2.0.0",
+    "jasmine-data-provider": "^2.2.0",
     "node-sass": "^4.5.3",
     "s3sync-cli": "^2.0.0",
-    "serverless": "^1.17.0",
+    "serverless": "^1.20.2",
     "serverless-dynamodb-autoscaling": "^0.6.1",
-    "serverless-stack-output": "0.2"
+    "serverless-plugin-typescript": "^1.1.1",
+    "serverless-stack-output": "^0.2.0",
+    "ts-jest": "^20.0.10"
   }
 }

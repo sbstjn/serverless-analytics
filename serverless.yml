@@ -1,8 +1,9 @@
 service: sls-analytics-new
 
 plugins:
-  - serverless-stack-output
   - serverless-dynamodb-autoscaling
+  - serverless-plugin-typescript
+  - serverless-stack-output
 
 provider:
   name: aws
