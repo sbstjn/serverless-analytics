@@ -23,11 +23,11 @@ To access the tracked data, a basic dashboard with a JSON API is included as wel
 - Amazon API Gateway for JSON API
 - [Dashboard w/ API to show metrics](http://sls-analytics-website-dashboard.s3-website-us-east-1.amazonaws.com/)
 
-*The use of two API Gateways (data tracking and reading) is intended. You might have different settings for tracking and data access when you build something meaningful out of this example.*
-
 #### Example
 
 - [Static website to track visitors](http://sls-analytics-website-example.s3-website-us-east-1.amazonaws.com)
+
+*The use of two API Gateways (data tracking and reading) is intended. You might have different settings for tracking and data access when you build something meaningful out of this example.*
 
 ## Configuration
 
@@ -70,7 +70,7 @@ The **website** includes a simple HTML file, some stylings, and a few JavaScript
 
 ## Tracking
 
-Basically, tracking is nothing more than sending a HTTP request to the API with a set of payload information *(currently `url`, `date`, `name`, and a `website` id)*. Normally you would have an additional non-JS fallback, like an image e.g., but a simple `fetch` call does the job for now:
+Basically, tracking is nothing more than sending a HTTP request to the API with a set of payload information *(currently `url`, `date`, `name`, and a `websiteId`)*. Normally you would have an additional non-JS fallback, like an image e.g., but a simple `fetch` call does the job for now:
 
 ```js
 fetch(
@@ -82,7 +82,7 @@ fetch(
         date: new Date().getTime(),
         name: document.title,
         url: location.href,
-        website: 'yfFbTv1GslRcIkUsWpa7' // Random ID
+        website: 'yfFbTv1GslRcIkUsWpa7'
       }
     ),
     headers: new Headers({ "Content-Type": "application/json" })
@@ -96,10 +96,10 @@ An example [dashboard to access tracked data](http://sls-analytics-website-dashb
 
 ### Top Content
 
-The `pages` resource scans the DynamoDB for the pages with the most hits on a specific `date` value:
+The `ranking` resource scans the DynamoDB for pages with the most hits on a specific `date` value:
 
 ```bash
-$ > curl https://p026537a2j.execute-api.us-east-1.amazonaws.com/dev/pages?website=yfFbTv1GslRcIkUsWpa7&date=MONTH:2017-08
+$ > curl https://p026537a2j.execute-api.us-east-1.amazonaws.com/dev/ranking?website=yfFbTv1GslRcIkUsWpa7&date=MONTH:2017-08
 
 [
   {
@@ -151,7 +151,7 @@ $ > curl https://p026537a2j.execute-api.us-east-1.amazonaws.com/dev/series?websi
 
 The DynamoDB stores the absolute hits number for the dimensions `YEAR`, `MONTH`, `DATE`, `HOUR`, and `MINUTE` per default. This may cause lots of write capacities when processing events, but with the [serverless-dynamodb-autoscaling](https://github.com/sbstjn/serverless-dynamodb-autoscaling) plugin DynamoDB will scale the capacities when needed.
 
-All dates are treated as UTC values!
+All dates are UTC values!
 
 ## Infrastructure
 

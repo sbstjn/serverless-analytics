@@ -20,7 +20,7 @@ provider:
 
 custom:
   stage: ${opt:stage, self:provider.stage}
-  website: yfFbTv1GslRcIkUsWpa7
+  website: yfFbTv1GslRcIkUsWpa7 # Random ID
   names:
     bucket: 
       website: ${self:service}-website
