@@ -1,0 +1,52 @@
+import * as AWS from 'aws-sdk'
+
+const ddb = new AWS.DynamoDB.DocumentClient()
+
+export function get(e: any, c: any, cb: any): void {
+  const query = e.queryStringParameters
+
+  const website = query.website || ''
+  const date = query.date || ''
+
+  ddb.scan(
+    {
+      ExpressionAttributeNames: {
+        '#date': 'date',
+        '#id': 'id'
+      },
+      ExpressionAttributeValues: {
+        ':date': date,
+        ':website': website
+      },
+      FilterExpression: 'begins_with(#id, :website) AND begins_with(#date, :date)',
+      TableName: process.env.DYNAMODB_TABLE_NAME || ''
+    }
+  ).promise().then(
+    (data: any) => data.Items || []
+  ).then(
+    (list: any) => list.sort(
+      (a: any, b: any) => a.value > b.value ? -1 : 1
+    )
+  ).then(
+    (list: any) => list.map(
+      (item: any) => {
+        item.url = item.id.split(':').slice(1).join(':')
+
+        delete item.id
+        delete item.date
+
+        return item
+      }
+    )
+  ).then(
+    (list: any) => ({
+      body: JSON.stringify(list),
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
+      statusCode: 200
+    })
+  ).then(
+    (data: any) => cb(null, data)
+  )
+}

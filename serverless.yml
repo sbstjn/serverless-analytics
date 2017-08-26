@@ -53,20 +53,18 @@ package:
     - yarn.lock
 
 functions:
-  list:
-    handler: src/list.get
-
-  metric-pages:
-    handler: src/metric/pages.get
-
-  metric-hits:
-    handler: src/metric/hits.get
-
-  route-list:
-    handler: src/route/list.get
+  series:
+    handler: src/api/series.get
     events:
       - http:
-          path: /list
+          path: /series
+          method: GET
+      
+  ranking:
+    handler: src/api/ranking.get
+    events:
+      - http:
+          path: /ranking
           method: GET
 
   process:

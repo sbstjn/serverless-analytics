@@ -9,11 +9,11 @@
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "outDir": "dist",
-    "sourceMap": false,
+    "sourceMap": true,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "target": "esnext",
-    "declaration": false
+    "declaration": true
   },
   "include": [
     "src/**/*",

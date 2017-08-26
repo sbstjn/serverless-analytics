@@ -91,19 +91,24 @@ An example [dashboard to access tracking data](http://sls-analytics-website-dash
 The included `metric-pages` function scans the DynamoDB for the pages with the most hits on a specific `date` value:
 
 ```bash
-$ > sls invoke -f metric-pages --data '{ "website": "yfFbTv1GslRcIkUsWpa7", "date": "MONTH:2017-08" }'
+$ > curl https://p026537a2j.execute-api.us-east-1.amazonaws.com/dev/pages?website=yfFbTv1GslRcIkUsWpa7&date=MONTH:2017-08
 
 [
-    {
-        "value": 28,
-        "name": "Example Website - Serverless Analytics",
-        "url": "http://sls-analytics-new-website.s3-website-us-east-1.amazonaws.com/bar"
-    },
-    {
-        "value": 19,
-        "name": "Example Website - Serverless Analytics",
-        "url": "http://sls-analytics-new-website.s3-website-us-east-1.amazonaws.com/baz"
-    }
+  {
+    "name": "Example Website - Serverless Analytics",
+    "url": "http://sls-analytics-new-website.s3-website-us-east-1.amazonaws.com/baz",
+    "value": 19
+  },
+  {
+    "name": "Example Website - Serverless Analytics",
+    "url": "http://sls-analytics-new-website.s3-website-us-east-1.amazonaws.com/",
+    "value": 10
+  },
+  {
+    "name": "Example Website - Serverless Analytics",
+    "url": "http://sls-analytics-new-website.s3-website-us-east-1.amazonaws.com/bar",
+    "value": 4
+  }
 ]
 ```
 
@@ -112,25 +117,25 @@ $ > sls invoke -f metric-pages --data '{ "website": "yfFbTv1GslRcIkUsWpa7", "dat
 The included `metric-hits` function scans the DynamoDB for statistics for a specific `url` in a given `date` period.
 
 ```bash
-$ > sls invoke -f metric-hits --data '{ "website": "yfFbTv1GslRcIkUsWpa7", "url": "http://sls-analytics-new-website.s3-website-us-east-1.amazonaws.com/baz", "date": "HOUR:2017-08-24T23"}'
+$ > curl https://p026537a2j.execute-api.us-east-1.amazonaws.com/dev/series?website=yfFbTv1GslRcIkUsWpa7&date=HOUR:2017-08-25T13&url=http://sls-analytics-new-website.s3-website-us-east-1.amazonaws.com/baz
 
 [
-    {
-        "value": 1,
-        "date": "2017-08-24T23:04"
-    },
-    {
-        "value": 1,
-        "date": "2017-08-24T23:07"
-    },
-    {
-        "value": 14,
-        "date": "2017-08-24T23:08"
-    },
-    {
-        "value": 1,
-        "date": "2017-08-24T23:13"
-    }
+  {
+    "date": "2017-08-25T13:33",
+    "value": 1
+  },
+  {
+    "date": "2017-08-25T13:37",
+    "value": 1
+  },
+  {
+    "date": "2017-08-25T13:46",
+    "value": 14
+  },
+  {
+    "date": "2017-08-25T13:52",
+    "value": 1
+  }
 ]
 ```
 

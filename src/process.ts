@@ -57,7 +57,7 @@ function update(data: EventData): Promise<any> {
   return Promise.resolve()
 }
 
-export function run(event, context, callback): void {
+export function run(event: any, context: any, callback: any): void {
   const data = event.Records || []
 
   // Create Promise for every received event
