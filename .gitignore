@@ -4,4 +4,7 @@ jspm_packages
 
 # Serverless directories
 .serverless
+build
 dist
+
+*.log

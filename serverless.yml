@@ -1,8 +1,9 @@
 service: sls-analytics
 
 plugins:
-  - serverless-stack-output
   - serverless-dynamodb-autoscaling
+  - serverless-plugin-typescript
+  - serverless-stack-output
 
 provider:
   name: aws
@@ -19,10 +20,11 @@ provider:
 
 custom:
   stage: ${opt:stage, self:provider.stage}
+  website: yfFbTv1GslRcIkUsWpa7 # Random ID
   names:
     bucket: 
-      website: ${self:service}-website-example
-      dashboard: ${self:service}-website-dashboard
+      website: ${self:service}-website
+      dashboard: ${self:service}-dashboard
     resource: track
     dynamodb: ${self:service}-data
     kinesis: ${self:service}-stream
@@ -31,11 +33,11 @@ custom:
   capacities:
     - table: DynamoDBTable
       read:
-        minimum: 5
-        maximum: 100
+        minimum: 10
+        maximum: 120
       write:
-        minimum: 5
-        maximum: 100
+        minimum: 10
+        maximum: 120
 
 package:
   exclude:
@@ -52,14 +54,18 @@ package:
     - yarn.lock
 
 functions:
-  list:
-    handler: src/list.get
-
-  route-list:
-    handler: src/route/list.get
+  series:
+    handler: src/api/series.get
     events:
       - http:
-          path: /list
+          path: /series
+          method: GET
+      
+  ranking:
+    handler: src/api/ranking.get
+    events:
+      - http:
+          path: /ranking
           method: GET
 
   process:
@@ -97,6 +103,9 @@ resources:
     Region:
       Description: AWS Region
       Value: { Ref: 'AWS::Region' }
+    WebsiteID:
+      Description: Website ID
+      Value: ${self:custom.website}
 
   Resources:
     KinesisStream:
@@ -110,11 +119,15 @@ resources:
       Properties:
         TableName: ${self:custom.names.dynamodb}
         AttributeDefinitions:
-          - AttributeName: url
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: date
             AttributeType: S
         KeySchema:
-          - AttributeName: url
+          - AttributeName: id
             KeyType: HASH
+          - AttributeName: date
+            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
@@ -144,7 +157,7 @@ resources:
         BucketName: ${self:custom.names.bucket.website}
         WebsiteConfiguration:
           IndexDocument: index.html
-          ErrorDocument: error.html
+          ErrorDocument: index.html
 
     BucketWebsitePolicy:
       Type: AWS::S3::BucketPolicy

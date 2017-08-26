@@ -31,7 +31,14 @@
       '<%=TrackingRootURL%>/<%=TrackingStageName%>/<%=TrackingResource%>',
       {
         method: "POST",
-        body: JSON.stringify( { url: location.href, name: document.title } ),
+        body: JSON.stringify(
+          {
+            date: new Date().getTime(),
+            name: document.title,
+            url: location.href,
+            website: '<%=WebsiteID%>'
+          }
+        ),
         headers: new Headers(
           {
             "Content-Type": "application/json"
