@@ -121,19 +121,19 @@ $ > curl https://p026537a2j.execute-api.us-east-1.amazonaws.com/dev/series?websi
 
 [
   {
-    "date": "2017-08-25T13:33",
+    "date": "MINUTE:2017-08-25T13:33",
     "value": 1
   },
   {
-    "date": "2017-08-25T13:37",
+    "date": "MINUTE:2017-08-25T13:37",
     "value": 1
   },
   {
-    "date": "2017-08-25T13:46",
+    "date": "MINUTE:2017-08-25T13:46",
     "value": 14
   },
   {
-    "date": "2017-08-25T13:52",
+    "date": "MINUTE:2017-08-25T13:52",
     "value": 1
   }
 ]

@@ -17,8 +17,8 @@ function dimensions(timestamp: number): string[] {
   }
 
   const dateString = util.format('%s-%s-%sT%s:%s', split.Year, split.Month, split.Date, split.Hour, split.Minute)
-
   const dateList: string[] = []
+
   while (metricList.length > 0) {
     const metric = metricList.pop()
 
@@ -28,47 +28,46 @@ function dimensions(timestamp: number): string[] {
   return dateList
 }
 
-interface EventData {
-  website: string
-  url: string
-  date: number
-  name: string
-}
-
 function update(data: EventData): Promise<any> {
+  const name = data.name
   const id = util.format('%s:%s', data.website, data.url)
 
-  if (data && data.url) {
-    return Promise.all(
-      dimensions(data.date).map(
-        (date: string) => ddb.update(
-          {
-            ExpressionAttributeNames : { '#value': 'value', '#name': 'name' },
-            ExpressionAttributeValues: { ':inc': 1, ':name': data.name },
-            Key: { id, date },
-            TableName,
-            UpdateExpression: 'ADD #value :inc SET #name = :name'
-          }
-        ).promise()
-      )
-    )
+  if (!data || !data.url) {
+    return Promise.resolve()
   }
 
-  return Promise.resolve()
+  return Promise.all(
+    dimensions(
+      data.date
+    ).map(
+      (date: string) => ddb.update(
+        {
+          ExpressionAttributeNames : { '#value': 'value', '#name': 'name' },
+          ExpressionAttributeValues: { ':inc': 1, ':name': name },
+          Key: { id, date },
+          TableName,
+          UpdateExpression: 'ADD #value :inc SET #name = :name'
+        }
+      ).promise()
+    )
+  )
 }
 
-export function run(event: any, context: any, callback: any): void {
+export function run(event: KinesisEvent, context: any, callback: any): void {
   const data = event.Records || []
 
   // Create Promise for every received event
   const list = data.map(
-    (item: any) => {
+    (item: KinesisItem) => {
       const buff = new Buffer(item.kinesis.data, 'base64').toString('ascii')
 
       try {
-        return update(JSON.parse(buff))
+        // Update valid data
+        return update(
+          JSON.parse(buff)
+        )
       } catch (error) {
-        // Ignore invalid data
+        // Ingore invalid data
         return Promise.resolve()
       }
     }
@@ -78,6 +77,6 @@ export function run(event: any, context: any, callback: any): void {
   Promise.all(
     list
   ).then(
-    (res: any) => callback(null, { done: true, num: list.length })
+    () => callback(null, { done: true, num: list.length })
   )
 }

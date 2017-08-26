@@ -12,14 +12,11 @@
     "sourceMap": true,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
-    "target": "esnext",
-    "declaration": true
+    "target": "esnext"
   },
   "include": [
     "src/**/*",
-    "vendor/**/*"
-  ],
-  "exclude": [
-    "node_modules/**/*"
+    "vendor/**/*",
+    "node_modules/serverless-types/**/*"
   ]
 }

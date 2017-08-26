@@ -3,15 +3,14 @@ import * as AWS from 'aws-sdk'
 const ddb = new AWS.DynamoDB.DocumentClient()
 const series = ['YEAR', 'MONTH', 'DATE', 'HOUR', 'MINUTE']
 
-
-export function get(e: any, c: any, cb: any) {
+export function get(e: LambdaHttpEvent, c: any, cb: any) {
   const query = e.queryStringParameters
 
   const date = query.date || ''
   const website = query.website || ''
   const url = query.url || ''
 
-  const metric = date.split(':').shift()
+  const metric = date.split(':').shift() || ''
   const index = series.indexOf(metric)
   const newDate = date.replace(metric, series[index + 1])
 
@@ -31,23 +30,19 @@ export function get(e: any, c: any, cb: any) {
   ).promise().then(
     (data: any) => data.Items || []
   ).then(
-    (list: any) => list.sort(
-      (a: any, b: any) => a.date < b.date ? -1 : 1
+    (list: DynamoDBItem[]) => list.sort(
+      (a: DynamoDBItem, b: DynamoDBItem) => a.date < b.date ? -1 : 1
     )
   ).then(
-    (list: any) => list.map(
-      (item: any) => {
-        item.url = item.id.split(':').slice(1).join(':')
-
-        delete item.id
-        delete item.url
-        delete item.name
-
-        return item
-      }
+    (list: DynamoDBItem[]) => list.map(
+      (item: DynamoDBItem) => ({
+        date: item.date,
+        url: item.id.split(':').slice(1).join(':'),
+        value: parseInt(item.value, 10)
+      })
     )
   ).then(
-    (list: any) => cb(null, {
+    (list: SeriesItem[]) => cb(null, {
       body: JSON.stringify(list),
       headers: {
         'Access-Control-Allow-Origin': '*'
