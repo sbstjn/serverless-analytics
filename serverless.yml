@@ -1,4 +1,4 @@
-service: sls-analytics-new
+service: sls-analytics
 
 plugins:
   - serverless-dynamodb-autoscaling

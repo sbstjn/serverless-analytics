@@ -104,17 +104,17 @@ $ > curl https://p026537a2j.execute-api.us-east-1.amazonaws.com/dev/ranking?webs
 [
   {
     "name": "Example Website - Serverless Analytics",
-    "url": "http://sls-analytics-new-website.s3-website-us-east-1.amazonaws.com/baz",
+    "url": "http://sls-analytics-website.s3-website-us-east-1.amazonaws.com/baz",
     "value": 19
   },
   {
     "name": "Example Website - Serverless Analytics",
-    "url": "http://sls-analytics-new-website.s3-website-us-east-1.amazonaws.com/",
+    "url": "http://sls-analytics-website.s3-website-us-east-1.amazonaws.com/",
     "value": 10
   },
   {
     "name": "Example Website - Serverless Analytics",
-    "url": "http://sls-analytics-new-website.s3-website-us-east-1.amazonaws.com/bar",
+    "url": "http://sls-analytics-website.s3-website-us-east-1.amazonaws.com/bar",
     "value": 4
   }
 ]
@@ -125,7 +125,7 @@ $ > curl https://p026537a2j.execute-api.us-east-1.amazonaws.com/dev/ranking?webs
 The `series` resource scans the DynamoDB for data about a specific `url` in a given `date` period.
 
 ```bash
-$ > curl https://p026537a2j.execute-api.us-east-1.amazonaws.com/dev/series?website=yfFbTv1GslRcIkUsWpa7&date=HOUR:2017-08-25T13&url=http://sls-analytics-new-website.s3-website-us-east-1.amazonaws.com/baz
+$ > curl https://p026537a2j.execute-api.us-east-1.amazonaws.com/dev/series?website=yfFbTv1GslRcIkUsWpa7&date=HOUR:2017-08-25T13&url=http://sls-analytics-website.s3-website-us-east-1.amazonaws.com/baz
 
 [
   {
