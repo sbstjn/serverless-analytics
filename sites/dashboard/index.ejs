@@ -45,7 +45,7 @@
     } 
 
     fetch(
-      '<%=APIRootURL%>/<%=APIStageName%>/ranking?website=<%=WebsiteID%>&date=YEAR:2017'
+      `<%=APIRootURL%>/<%=APIStageName%>/ranking?website=<%=WebsiteID%>&date=YEAR:${(new Date()).getFullYear()}`
     ).then(
       res => res.json()
     ).then(
