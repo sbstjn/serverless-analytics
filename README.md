@@ -50,7 +50,17 @@ The S3 Bucket configuration is only needed for the included example website and 
 
 *Amazon requires unique names for S3 buckets and other resources. Please rename at least the service before you try to deploy the example!*
 
+
 ## Deployment
+
+`s3sync` requires you to set AWS access keys as environmental variables.
+
+```bash
+  AWS_ACCESS_KEY=abc123
+  AWS_SECRET_KEY=def456
+```
+
+Deploy script uses [jq](https://stedolan.github.io/jq/) to read variables from generated output during deployment process. If you don't have jq installed, [download it here](https://stedolan.github.io/jq/download/). 
 
 Running `yarn deploy` will trigger a [serverless](https://serverless.com) deployment. After the output of your CloudFormation Stack is available, the included static websites will be generated *(using the hostname from the stack output)* and uploaded to the configured S3 buckets. As the last step, the deploy process will display the URLs of the example website and dashboard:
 
