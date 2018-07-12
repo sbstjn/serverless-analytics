@@ -1,15 +1,15 @@
 # Serverless Analytics ⚡️
 
-[![serverless](http://public.serverless.com/badges/v3.svg)](http://www.serverless.com) 
-[![license](https://img.shields.io/github/license/sbstjn/serverless-analytics.svg)](LICENSE.md)
+[![MIT License](https://badgen.now.sh/badge/License/MIT/blue)](https://github.com/sbstjn/serverless-analytics/blob/master/LICENSE.md)
+[![Read Tutorial](https://badgen.now.sh/badge/Read/Tutorial/orange)](https://sbstjn.com/serverless-analytics-with-kinesis-stream-lambda.html)
 
-Example project for a personal [serverless](https://serverless.com) *Google Analytics* clone to track website visitors.
+Example project and proof of concept for a personal [serverless](https://serverless.com) *Google Analytics* clone to track website visitors. You can read more about [Serverless Analytics with Amazon Kinesis and AWS Lambda](https://sbstjn.com/serverless-analytics-with-kinesis-stream-lambda.html) on [sbstjn.com](https://sbstjn.com) …
+
+## Components
 
 After deploying the service you will have an HTTP endpoint using Amazon API Gateway that accepts requests and puts them into a Kinesis Stream. A Lambda function processes the stream and writes basic metrics about how many visitors you have per absolute URL to DynamoDB. 
 
 To access the tracked data, a basic dashboard with a JSON API is included as well. This should be a perfect starting point for you to create your own analytics service.
-
-## Components
 
 #### Tracking Service
 
